@@ -1,6 +1,8 @@
 package com.codepath.android.booksearch.activities
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -24,6 +26,10 @@ import org.json.JSONArray
 import org.json.JSONException
 import java.util.ArrayList
 import androidx.appcompat.widget.SearchView
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+class BookParcel(val cover: String?, val title: String?, val author: String?): Parcelable
 
 
 class BookListActivity : AppCompatActivity() {
@@ -40,7 +46,7 @@ class BookListActivity : AppCompatActivity() {
         // Switch Activity to Use a Toolbar
         // see http://guides.codepath.org/android/Using-the-App-ToolBar#using-toolbar-as-actionbar
         val toolbar: Toolbar = findViewById<View>(R.id.toolbar) as Toolbar
-        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar)
 
         // Initialize the adapter
         bookAdapter = BookAdapter(this, booksList)
@@ -55,7 +61,12 @@ class BookListActivity : AppCompatActivity() {
                 // Checkpoint #5
                 // Hook up Book Detail View
                 // see https://guides.codepath.org/android/Using-the-RecyclerView#attaching-click-handlers-using-listeners for setting up click listeners
+                val book = booksList[position]
+                val bookParcel = BookParcel(book.coverUrl, book.title, book.author)
+                val i = Intent(this@BookListActivity, BookDetailActivity::class.java)
+                i.putExtra("book", bookParcel)
 
+                startActivity(i)
                 // Create Intent to start BookDetailActivity
                 // Get Book at the given position
                 // Pass the book into details activity using extras
@@ -119,8 +130,6 @@ class BookListActivity : AppCompatActivity() {
                 if (query != null) {
                     fetchBooks(query)
                 }
-                // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
-                // see https://code.google.com/p/android/issues/detail?id=24599
                 searchView.clearFocus()
                 return true
             }
