@@ -23,6 +23,7 @@ import okhttp3.Headers
 import org.json.JSONArray
 import org.json.JSONException
 import java.util.ArrayList
+import androidx.appcompat.widget.SearchView
 
 
 class BookListActivity : AppCompatActivity() {
@@ -69,7 +70,7 @@ class BookListActivity : AppCompatActivity() {
         rvBooks.layoutManager = LinearLayoutManager(this)
 
         // Fetch the data remotely
-        fetchBooks("Oscar Wilde")
+        // fetchBooks("Oscar Wilde")
     }
 
     // Executes an API call to the OpenLibrary search endpoint, parses the results
@@ -110,7 +111,24 @@ class BookListActivity : AppCompatActivity() {
         // Checkpoint #4
         // Add SearchView to Toolbar
         // Refer to http://guides.codepath.org/android/Extended-ActionBar-Guide#adding-searchview-to-actionbar guide for more details
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView: SearchView = MenuItemCompat.getActionView(searchItem) as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // perform query here
+                if (query != null) {
+                    fetchBooks(query)
+                }
+                // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
+                // see https://code.google.com/p/android/issues/detail?id=24599
+                searchView.clearFocus()
+                return true
+            }
 
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+        })
 
         // Checkpoint #7 Show Progress Bar
         // see https://guides.codepath.org/android/Handling-ProgressBars#progress-within-actionbar
